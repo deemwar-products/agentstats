@@ -1,0 +1,201 @@
+{{define "profile.html"}}{{template "htmlopen" .}}
+<head>
+{{template "head" .}}
+<title>{{if .Name}}{{.Name}}{{else}}{{.Login}}{{end}} (@{{.Login}}): before vs after agents · agentstats</title>
+{{if not .Private}}
+<meta name="description" content="{{if .Headline}}{{.Headline}}{{else}}An honest before/after card of the code they actually wrote.{{end}}">
+<meta property="og:type" content="profile">
+<meta property="og:site_name" content="agentstats by deemwar">
+<meta property="og:title" content="{{if .Name}}{{.Name}}{{else}}@{{.Login}}{{end}}: before agents vs after agents">
+<meta property="og:description" content="{{if .Headline}}{{.Headline}} Imports and generated code excluded.{{else}}An honest before/after card of the code they actually wrote.{{end}}">
+<meta property="og:image" content="{{.OGImage}}">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:url" content="{{.ProfileURL}}">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="{{if .Name}}{{.Name}}{{else}}@{{.Login}}{{end}}: before agents vs after agents">
+<meta name="twitter:description" content="{{if .Headline}}{{.Headline}}{{else}}An honest before/after card of the code they actually wrote.{{end}}">
+<meta name="twitter:image" content="{{.OGImage}}">
+{{end}}
+</head>
+<body>
+<div class="wrap">
+{{template "top" .}}
+
+{{if .Private}}
+  <div class="panel narrow center">
+    <div class="kicker">@{{.Login}}</div>
+    <h2>This profile is private</h2>
+    <p class="muted">Its owner has switched off the public profile. Want your own?</p>
+    <a class="btn accent" href="/auth/login">Sign in with GitHub, free</a>
+  </div>
+{{else}}
+
+  <div class="dash-head">
+    <div class="avatar">{{if and .View .View.AvatarURL}}<img src="{{.View.AvatarURL}}" alt="">{{else}}{{if .View}}{{.View.Initial}}{{else}}@{{end}}{{end}}</div>
+    <div class="who"><b>{{if .Name}}{{.Name}}{{else}}{{.Login}}{{end}}</b>
+      <div class="muted meta">@{{.Login}}{{with .View}} · {{.Repos}} repos{{if .Updated}} · updated {{.Updated}}{{end}} · agent era from <b>{{.AgentStartTxt}}</b>{{end}}{{if .IsOwner}} <a class="small" href="/settings">change</a>{{end}}</div>
+    </div>
+    <div class="chips">
+      {{with .Rank}}<a class="rank-chip" href="/leaderboard{{if ne .BoardSlug "shift"}}?board={{.BoardSlug}}{{end}}">{{template "tierpill" .Row.Tier}}<span><b>#{{.Row.Rank}}</b> of {{.Of}} · {{.Board}}</span></a>{{end}}
+      {{if .IsOwner}}
+        {{if .IsPublic}}<a class="chip ok" href="/u/{{.Login}}">● public profile</a>{{else}}<a class="chip" href="/settings">○ private profile</a>{{end}}
+        {{with .Job}}{{if or (eq .Status "queued") (eq .Status "running")}}<a class="chip warn" href="/u/{{$.Login}}/status">● analysis {{.Status}}</a>{{end}}{{end}}
+        <form class="inline" method="post" action="/api/analyze" hx-post="/api/analyze" hx-target="#refresh-msg" hx-swap="innerHTML"><button class="btn ghost sm" type="submit">↻ Refresh</button></form>
+      {{else if not .Rank}}
+        <a class="btn accent sm" href="/auth/login">Get your own card</a>
+      {{end}}
+    </div>
+  </div>
+  <div id="refresh-msg"></div>
+
+  {{if and .Rank (not .IsOwner)}}{{with .Rank}}
+  <div class="me-strip">
+    <div><div class="small dim">@{{.Row.Login}} · {{.Board}}</div><div class="big">#{{.Row.Rank}} <small>of {{.Of}}</small></div></div>
+    {{template "lbshare" .}}
+    <div class="grow"></div>
+    <a class="btn accent" href="{{if $.SignedIn}}/leaderboard{{else}}/auth/login{{end}}">See yours →</a>
+  </div>
+  {{end}}{{end}}
+
+  {{if and .IsOwner .View}}{{if .View.NeedsInstall}}
+  <div class="panel banner">
+    <div><div class="kicker">One more step</div><b>Install the app on your repos</b>
+      <div class="muted small">Without the read-only app we can only see your public commits. Pick all repos or just some; private repos are never named.</div></div>
+    <a class="btn accent" href="{{.View.InstallURL}}">Install the app on your repos</a>
+  </div>
+  {{end}}{{end}}
+
+  {{if and .HasStats .View}}
+  {{with .View}}
+  {{if $.IsOwner}}
+  <div class="panel sharebar">
+    <b>Share your stats</b>
+    <div class="share">
+      <a href="{{$.ShareLinkedIn}}" target="_blank" rel="noopener"><i style="background:#0a66c2"></i>LinkedIn</a>
+      <a href="{{$.ShareX}}" target="_blank" rel="noopener"><i class="x"></i>X</a>
+      <a href="{{$.ShareWhatsApp}}" target="_blank" rel="noopener"><i style="background:#25d366"></i>WhatsApp</a>
+      <a href="{{$.ProfileURL}}" onclick="return copyText('{{$.ProfileURL}}', this)"><i style="background:var(--ink-3)"></i>Copy link</a>
+      <a href="/og/{{$.Login}}.png" download="agentstats-{{$.Login}}.png"><i style="background:var(--accent)"></i>Download PNG</a>
+      <a href="/share/{{$.Login}}"><i style="background:var(--l2)"></i>Previews</a>
+    </div>
+  </div>
+  {{end}}
+
+  {{with .Card1}}
+  <div class="card1 gap">
+    <div class="kicker">{{.Kicker}}</div>
+    <h2>{{.Headline}}</h2>
+    <div class="grid2">
+      {{template "era" .Before}}
+      <div class="era after">
+        <div class="lbl">{{.After.Label}}</div><div class="span">{{.After.Span}}</div>
+        <div class="big">{{.After.Big}}</div><div class="sub">lines of code</div>
+        <dl>{{range .After.Rows}}<div><dt>{{.K}}</dt><dd>{{.V}}</dd></div>{{end}}</dl>
+      </div>
+    </div>
+    {{if .Callout}}<div class="callout"><b>{{.CalloutLead}}</b> {{.Callout}}</div>{{end}}
+    <div class="foot"><span>{{.Excluded}} lines of imports &amp; generated code excluded · <a href="#excl">see why</a></span><a href="https://cli.deemwar.com" class="brandlink"><b>agentstats by deemwar</b></a></div>
+  </div>
+  {{end}}
+
+  {{with .Card2}}
+  <div class="card1 gap">
+    <div class="kicker">What the code is made of</div>
+    <h2>{{.Headline}}</h2>
+    <div class="muted era-cap">{{.BeforeLabel}}</div>
+    <div class="bar">{{range .BeforeLangs}}<i style="width:{{.Pct}}%;background:{{.Color}}" title="{{.Name}} {{.Pct}}%"></i>{{end}}</div>
+    <div class="legend">{{range .BeforeLangs}}<span><i style="background:{{.Color}}"></i>{{.Name}} <b>{{.Pct}}%</b></span>{{end}}</div>
+    <div class="muted era-cap" style="margin-top:16px">{{.AfterLabel}}</div>
+    <div class="bar">{{range .AfterLangs}}<i style="width:{{.Pct}}%;background:{{.Color}}" title="{{.Name}} {{.Pct}}%"></i>{{end}}</div>
+    <div class="legend">{{range .AfterLangs}}<span><i style="background:{{.Color}}"></i>{{.Name}} <b>{{.Pct}}%</b></span>{{end}}</div>
+
+    <div class="kicker" style="margin-top:26px">{{.ChartKicker}}</div>
+    {{if .ChartNote}}<div class="muted era-note">{{.ChartNote}}</div>{{end}}
+    <div class="chart">{{.Chart}}</div>
+
+    <div class="pairs">{{range .Pairs}}<div><b>{{.K}}</b><span>{{.V}}</span></div>{{end}}</div>
+    <div class="foot"><span>Honest count · <a href="/methodology">methodology</a></span><a href="https://cli.deemwar.com" class="brandlink"><b>agentstats by deemwar</b></a></div>
+  </div>
+  {{end}}
+
+  {{with .Timeline}}{{if .Chart}}
+  <div class="card1 mt16">
+    <div class="kicker">All your code, {{.Caption}}</div>
+    <div class="chart">{{.Chart}}</div>
+    {{if .EraNote}}<p class="callout">{{.EraNote}}</p>{{end}}
+    {{if .Langs}}
+    <div class="kicker mt16">Top languages since agents</div>
+    <div class="tablewrap"><table class="rank">
+      <tr><th>#</th><th>Language</th><th class="num">Before</th><th class="num">After</th></tr>
+      {{range .Langs}}<tr><td class="rankn">{{.Rank}}</td><td><i class="dot" style="background:{{.Color}}"></i>{{.Lang}}</td><td class="num">{{.Before}} <span class="faint">{{.BeforePct}}</span></td><td class="num"><b>{{.After}}</b> <span class="faint">{{.AfterP}}</span></td></tr>{{end}}
+    </table></div>
+    {{end}}
+    <div class="foot"><span>Honest count · <a href="/methodology">methodology</a></span><a href="https://cli.deemwar.com" class="brandlink"><b>agentstats by deemwar</b></a></div>
+  </div>
+  {{end}}{{end}}
+
+  <div class="grid2 gap">
+    {{with .Timeline}}{{if .Releases}}
+    <div class="panel">
+      <div class="kicker">Which AI release made you bigger</div>
+      <h3 class="mt6">{{if .BestLine}}{{.BestLine}}{{else}}Your pace between AI releases{{end}}</h3>
+      {{range .Releases}}<div class="tools-row{{if .Best}} best{{end}}"><span class="name" title="{{.Date}}">{{.Release}}<br><span class="faint small">{{.Date}}</span></span><span class="track"><i style="width:{{.Width}}%;background:{{if .Best}}var(--accent){{else}}var(--bar){{end}}"></i></span><span class="val">{{.Pace}}{{if .Mult}} · <b>{{.Mult}}</b>{{end}}</span></div>{{end}}
+      <p class="faint small mt12">Average honest lines per month from each release until the next, compared with the stretch before it. Based on your own history, not on which commits an agent signed.</p>
+    </div>
+    {{end}}{{end}}
+    {{with .Excl}}
+    <div class="panel" id="excl">
+      <div class="kicker">Why these lines don't count</div>
+      <h3 class="mt6">{{.Total}} lines excluded</h3>
+      <div class="tablewrap">
+      <table>
+        <tr><th>What</th><th>Where</th><th class="num">Lines</th></tr>
+        {{range .Rows}}<tr><td><span class="tag">{{.Tag}}</span></td><td>{{.Where}}</td><td class="num">{{.Lines}}</td></tr>{{end}}
+        {{if .More}}<tr><td colspan="2" class="faint">+ {{.More}} more dropped commits · lockfiles, vendored and generated files are skipped per file</td><td class="num"><a href="/methodology">rules</a></td></tr>{{end}}
+        {{if not .Rows}}<tr><td colspan="3" class="faint">Nothing was excluded.</td></tr>{{end}}
+      </table>
+      </div>
+    </div>
+    {{end}}
+  </div>
+  {{end}}
+
+  {{if .IsOwner}}
+  <div class="panel gap readme">
+    <div><div class="kicker">Put it in your README</div>
+      <pre class="snip" id="embed">[![agentstats]({{.BadgeURL}})]({{.ProfileURL}})</pre></div>
+    <div class="readme-actions"><a class="btn ghost sm" href="#" onclick="return copyPre('embed', this)">Copy</a><a class="btn primary sm" href="/badges">Design a badge →</a></div>
+  </div>
+  {{end}}
+
+  {{else}}
+  <div class="panel narrow center gap">
+    <div class="kicker">No stats yet</div>
+    {{if and .IsOwner .Job}}
+      <div hx-get="{{.StatusURL}}" hx-trigger="load" hx-swap="outerHTML"></div>
+    {{else if .IsOwner}}
+      <h2>Let's count your history</h2>
+      <p class="muted">Pick the repos to count. We clone each one read-only, count only the lines you wrote, and throw the code away.</p>
+      <a class="btn accent" href="/repos">Choose repos to analyze</a>
+    {{else}}
+      <h2>@{{.Login}} hasn't been analyzed yet</h2>
+      <a class="btn accent" href="/auth/login">Get your own card</a>
+    {{end}}
+  </div>
+  {{end}}
+{{end}}
+
+{{template "sitefooter" .}}
+</div>
+{{template "copyscript" .}}
+</body>
+</html>{{end}}
+
+{{define "era"}}
+<div class="era">
+  <div class="lbl">{{.Label}}</div><div class="span">{{.Span}}</div>
+  <div class="big">{{.Big}}</div><div class="sub">lines of code</div>
+  <dl>{{range .Rows}}<div><dt>{{.K}}</dt><dd>{{.V}}</dd></div>{{end}}</dl>
+</div>
+{{end}}

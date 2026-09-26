@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title %}agentstats — before agents vs after agents{% endblock %}
+{% block content %}
+<h1>How much code did you write <span class="muted">before</span> agents — and <span class="muted">after</span>?</h1>
+<p class="muted">Sign in with GitHub. Get an honest before/after card of the code you actually wrote — with the
+bulk imports and generated code excluded and shown, so the number is defensible.</p>
+
+<p><a class="btn" href="/auth/login">Sign in with GitHub</a> &nbsp; <a href="/methodology">How the counting works →</a></p>
+
+<h2>What you get</h2>
+<ul>
+  <li><strong>Before / after card</strong> — years, lines, top language, commits and pace on each side of the agent era.</li>
+  <li><strong>Composition card</strong> — the language shift, lines per month with the peak highlighted, and three before→after stat pairs.</li>
+  <li><strong>A README badge</strong> — <code>agent era | 1.25M lines · 1.8×</code>.</li>
+</ul>
+
+<h2>Why the number is honest</h2>
+<p>Naive line counts are inflated by vendored code, lock files, generated files and bulk imports. agentstats
+excludes them <em>and shows what it excluded</em> right on the card.</p>
+
+<p class="muted">Private repos contribute to your totals only — their names never appear on a public card.
+Delete-my-data removes everything immediately. Read the full method at <a href="{{ site }}/methodology">{{ site }}/methodology</a>.</p>
+{% endblock %}

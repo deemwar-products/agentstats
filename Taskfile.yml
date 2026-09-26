@@ -1,0 +1,56 @@
+# agentstats dev tasks. Deploy is OWNER-GATED and intentionally a no-op here.
+version: "3"
+
+tasks:
+  default:
+    cmds:
+      - task -l
+    silent: true
+
+  test:
+    desc: Run all local tests (analyzer regression + rules, store queue/cache).
+    cmds:
+      - cd analyzer && go test ./...
+
+  test:analyzer:
+    desc: Go analyzer counting rules + regression fixture.
+    cmds:
+      - cd analyzer && go test ./...
+
+  server:
+    desc: Run the single-container backend locally (in-memory store). DEV sign-in at /auth/dev?login=you.
+    cmds:
+      - cd analyzer && DEV_AUTH=1 ADDR=:8080 go run ./cmd/server
+
+  analyze:
+    desc: Run the analyzer over local bare clones (CLI mode). Pass ARGS='--repos ... --emails ...'.
+    cmds:
+      - cd analyzer && go run ./cmd/analyzer local {{.ARGS}}
+
+  build:
+    desc: Build the Go module (analyzer + server + web + jobs + store + r2).
+    cmds:
+      - cd analyzer && go build ./...
+
+  dev:
+    desc: Run the front Worker locally (wrangler dev; owner-gated resources needed).
+    cmds:
+      - cd worker && wrangler dev
+
+  deploy:
+    desc: "OWNER-GATED — does NOT deploy. Prints the go-live checklist."
+    cmds:
+      - |
+        cat <<'EOF'
+        deploy is owner-gated and is intentionally a no-op in this Taskfile.
+        Go-live requires the owner to (see LAUNCH.md + docs/architecture/08):
+          1. Create the GitHub App under deemwar-products (manifest flow, one click).
+          2. wrangler secret put GITHUB_APP_ID / GITHUB_CLIENT_ID / GITHUB_CLIENT_SECRET
+             / GITHUB_APP_PRIVATE_KEY / SESSION_KEY   (values from `sec`, never committed).
+          3. wrangler d1 create agentstats && wrangler d1 migrations apply agentstats
+          4. wrangler r2 bucket create agentstats-cards  (+ a scoped R2 API token).
+          5. Confirm the Workers Paid plan (Containers require it).
+          6. wrangler deploy  and point agentstats.deemwar.com at the Worker (DNS).
+          7. Flip the repo to public.
+        None of these are done by this task.
+        EOF

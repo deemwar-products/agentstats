@@ -1,0 +1,20 @@
+[
+  {"date": "2021-06-29", "tool": "GitHub Copilot", "event": "technical preview", "kind": "assistant", "source": "TODO(owner): verify against vendor announcement before launch"},
+  {"date": "2022-06-21", "tool": "GitHub Copilot", "event": "generally available", "kind": "assistant", "source": "TODO(owner): verify against vendor announcement before launch"},
+  {"date": "2022-11-30", "tool": "ChatGPT", "event": "launch", "kind": "chat", "source": "TODO(owner): verify against vendor announcement before launch"},
+  {"date": "2023-03-14", "tool": "GPT-4", "event": "release", "kind": "model", "source": "TODO(owner): verify against vendor announcement before launch"},
+  {"date": "2023-03-14", "tool": "Claude", "event": "first release", "kind": "model", "source": "TODO(owner): verify against vendor announcement before launch"},
+  {"date": "2024-03-04", "tool": "Claude 3 Opus", "event": "release", "kind": "model", "source": "TODO(owner): verify against vendor announcement before launch"},
+  {"date": "2024-06-20", "tool": "Claude 3.5 Sonnet", "event": "release", "kind": "model", "source": "TODO(owner): verify against vendor announcement before launch"},
+  {"date": "2025-02-24", "tool": "Claude Code", "event": "research preview (with Claude 3.7 Sonnet)", "kind": "agent", "source": "TODO(owner): verify against vendor announcement before launch"},
+  {"date": "2025-04-16", "tool": "OpenAI Codex CLI", "event": "release", "kind": "agent", "source": "TODO(owner): verify against vendor announcement before launch"},
+  {"date": "2025-05-16", "tool": "OpenAI Codex", "event": "cloud agent", "kind": "agent", "source": "TODO(owner): verify against vendor announcement before launch"},
+  {"date": "2025-05-19", "tool": "GitHub Copilot coding agent", "event": "preview", "kind": "agent", "source": "TODO(owner): verify against vendor announcement before launch"},
+  {"date": "2025-05-22", "tool": "Claude Opus 4 / Claude Code GA", "event": "release", "kind": "agent", "source": "TODO(owner): verify against vendor announcement before launch"},
+  {"date": "2025-08-07", "tool": "GPT-5", "event": "release", "kind": "model", "source": "TODO(owner): verify against vendor announcement before launch"},
+  {"date": "2025-09-29", "tool": "Claude Sonnet 4.5", "event": "release", "kind": "model", "source": "TODO(owner): verify against vendor announcement before launch"},
+  {"date": "2025-11-24", "tool": "Claude Opus 4.5", "event": "release", "kind": "model", "source": "TODO(owner): verify against vendor announcement before launch"},
+  {"date": "2026-06-09", "tool": "Claude Fable 5", "event": "release", "kind": "model", "source": "https://platform.claude.com/docs/en/about-claude/models/introducing-claude-fable-5-and-claude-mythos-5"},
+  {"date": "2026-09-01", "tool": "Claude Fable 5.1", "event": "release", "kind": "model", "source": "https://emergent.sh/news/claude-fable-5-1-release-date"},
+  {"date": "2026-09-03", "tool": "GPT-6 Astra", "event": "release (coding, computer use)", "kind": "model", "source": "https://openai.com/index/gpt-6-astra/"}
+]

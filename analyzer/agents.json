@@ -1,0 +1,16 @@
+[
+  {"tool": "Claude Code", "field": "trailer", "match": "Co-Authored-By: Claude", "model_regex": "(?i)Co-Authored-By:\\s*(Claude[^<\\n]*?)\\s*<"},
+  {"tool": "Claude Code", "field": "body", "match": "Generated with Claude Code"},
+  {"tool": "Claude Code", "field": "author_name", "match": "claude[bot]"},
+  {"tool": "GitHub Copilot", "field": "author_name", "match": "copilot-swe-agent[bot]"},
+  {"tool": "GitHub Copilot", "field": "author_name", "match": "Copilot"},
+  {"tool": "GitHub Copilot", "field": "trailer", "match": "Co-authored-by: Copilot"},
+  {"tool": "OpenAI Codex", "field": "author_name", "match": "chatgpt-codex-connector[bot]"},
+  {"tool": "OpenAI Codex", "field": "author_name", "match": "codex"},
+  {"tool": "OpenAI Codex", "field": "trailer", "match": "codex"},
+  {"tool": "Cursor", "field": "author_name", "match": "cursor[bot]"},
+  {"tool": "Cursor", "field": "trailer", "match": "Co-authored-by: Cursor Agent"},
+  {"tool": "Devin", "field": "author_name", "match": "devin-ai-integration[bot]"},
+  {"tool": "Aider", "field": "trailer", "match": "Co-authored-by: aider"},
+  {"tool": "Aider", "field": "subject", "match": "aider:"}
+]

@@ -1,0 +1,32 @@
+[package]
+name = "agentstats-worker"
+version = "0.1.0"
+edition = "2021"
+authors = ["deemwar <oss@deemwar.com>"]
+description = "agentstats Worker — sign-in, site pages, and serving pre-rendered cards from R2. Renders nothing itself."
+license = "MIT"
+repository = "https://github.com/deemwar-products/agentstats"
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+# workers-rs: the Worker + Durable Object + D1 + R2 + Containers bindings.
+worker = { version = "0.4", features = ["d1", "http"] }
+# Server-side HTML — no JS framework, no TypeScript.
+askama = { version = "0.12", default-features = false, features = ["config"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+# HMAC-signed session cookie (github_id|exp).
+hmac = "0.12"
+sha2 = "0.10"
+# Randomness in wasm (OAuth state / PKCE verifier).
+getrandom = { version = "0.2", features = ["js"] }
+hex = "0.4"
+base64 = "0.22"
+
+[profile.release]
+# Smaller wasm.
+opt-level = "s"
+lto = true
+strip = true

@@ -1,0 +1,14 @@
+{{define "job_status.html"}}
+<div id="job"{{if .Polling}} hx-get="/u/{{.Login}}/status" hx-trigger="every 3s" hx-swap="outerHTML"{{end}}>
+  <div class="kicker">{{if eq .State "done"}}Done · {{if .IsOwner}}your{{else}}@{{.Login}}'s{{end}} headline{{else if eq .State "failed"}}Analysis stopped{{else}}Analyzing {{if .IsOwner}}your{{else}}@{{.Login}}'s{{end}} history{{end}}</div>
+  {{if .Headline}}<h2>{{.Headline}}</h2>{{else}}<h2>{{.Title}}</h2>{{end}}
+  <div class="progress{{if .Indeterminate}} indet{{end}}{{if eq .State "failed"}} failed{{end}}"><i style="width:{{if .Indeterminate}}35{{else}}{{.Pct}}{{end}}%"></i></div>
+  <p class="muted small status-detail">{{if .Detail}}{{.Detail}}<a href="{{if .Href}}{{.Href}}{{else}}/u/{{.Login}}{{end}}"><b>{{.ProfileURL}}</b></a>{{else}}Nothing is running.{{end}}</p>
+  {{if .Tiles}}<div class="status-tiles">{{range .Tiles}}<div><b>{{.Value}}</b><span>{{.Label}}</span></div>{{end}}</div>{{end}}
+  {{if .Log}}<div class="log">{{range .Log}}{{if eq .Kind "ok"}}<b>{{.Mark}}</b>{{else if eq .Kind "bad"}}<em>{{.Mark}}</em>{{else}}{{.Mark}}{{end}} {{.Text}}
+{{end}}</div>{{end}}
+  {{if eq .State "queued"}}<p class="faint small mt14">First-time analyses go ahead of refreshes, and very large accounts run in their own lane, so the line moves fairly.</p>{{end}}
+  {{if eq .State "done"}}<a class="btn accent mt14" href="{{if .IsOwner}}/dashboard{{else}}/u/{{.Login}}{{end}}">See the cards →</a>{{end}}
+  {{if and (eq .State "failed") .IsOwner}}<a class="btn primary mt14" href="/dashboard">Back to the dashboard</a>{{end}}
+</div>
+{{end}}

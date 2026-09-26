@@ -1,0 +1,57 @@
+{{define "methodology.html"}}{{template "htmlopen" .}}
+<head>
+{{template "head" .}}
+<title>Methodology — agentstats</title>
+</head>
+<body>
+<div class="wrap">
+{{template "top" .}}
+<div class="kicker">Methodology</div>
+<h1>How the counting works</h1>
+<div class="panel prose">
+<p class="muted">The single source of truth for these rules is <code>analyzer/rules.go</code>; this page is generated from those same constants.</p>
+
+<h2>What counts</h2>
+<ul>
+  <li><strong>Author</strong> = your verified GitHub emails. Commits are deduped by SHA across every repo and fork (<code>--all --no-merges</code>).</li>
+  <li><strong>Lines</strong> = <em>added</em> lines from <code>git log --numstat</code>, code languages only — {{.LangCount}} recognised file extensions.</li>
+</ul>
+
+<h2>What is excluded</h2>
+<ul>
+  <li><strong>Non-code</strong>: {{range $i, $l := .NotCode}}{{if $i}}, {{end}}{{$l}}{{end}} are not counted as code.</li>
+  <li><strong>Per file</strong>: a single file adding more than {{.MaxFileAdded}} lines is skipped.</li>
+  <li><strong>Per commit</strong>: a commit touching more than {{.MaxCommitFiles}} files or adding more than {{.MaxCommitLines}} lines is dropped whole (bulk import) — and every dropped commit is listed on your card.</li>
+  <li><strong>Paths</strong>: dependency, build, output, vendored, generated and lock/minified/asset files are skipped by this pattern:
+    <pre><code>{{.SkipPattern}}</code></pre>
+  </li>
+</ul>
+
+<h2>What we can't see</h2>
+<p>Time in a chat or an agent session never reaches git, and unsigned agent code looks like human code — so
+the card says <strong>at least</strong> N% agent-signed, never "N% AI".</p>
+
+<h2>AI release timeline</h2>
+<p class="muted">Ticks on the monthly chart. <strong>These dates are unverified drafts</strong> — each still needs a
+vendor-announcement source before launch.</p>
+<div class="tablewrap"><table class="milestones">
+  <thead><tr><th>date</th><th>tool</th><th>event</th></tr></thead>
+  <tbody>
+  {{range .Milestones}}<tr><td>{{.Date}}</td><td>{{.Tool}}</td><td>{{.Event}}</td></tr>{{end}}
+  </tbody>
+</table></div>
+
+<h2 id="privacy">What we keep</h2>
+<div class="tablewrap"><table>
+  <tr><td>Your code</td><td><b>never stored</b>. Wiped after the job</td></tr>
+  <tr><td>Your token</td><td><b>never stored</b>. Held in memory for one job</td></tr>
+  <tr><td>Private repo names</td><td><b>never shown</b>. They appear as "a private repo"</td></tr>
+  <tr><td>Monthly totals per language / tool</td><td>kept (aggregates only)</td></tr>
+  <tr><td>Delete my data</td><td>one click in Settings, immediate</td></tr>
+</table></div>
+</div>
+
+{{template "sitefooter" .}}
+</div>
+</body>
+</html>{{end}}

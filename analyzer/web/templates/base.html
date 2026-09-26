@@ -1,0 +1,75 @@
+{{define "htmlopen"}}<!doctype html>
+<html lang="en"{{if .Theme}} data-theme="{{.Theme}}"{{end}}>{{end}}
+
+{{define "head"}}
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" type="image/png" href="/static/img/favicon.png">
+<link rel="apple-touch-icon" href="/static/img/logo.png">
+<link rel="stylesheet" href="/static/app.css">
+<script src="https://cdn.jsdelivr.net/npm/htmx.org@2.0.4/dist/htmx.min.js" integrity="sha384-HGfztofotfshcF7+8n44JQL2oJmowVChPTg48S+jvZoztPfvwD79OC/LTtG6dMp+" crossorigin="anonymous" defer></script>
+<script>
+function toggleTheme(){
+  var r=document.documentElement;
+  var dark=r.dataset.theme==='dark'||(!r.dataset.theme&&matchMedia('(prefers-color-scheme: dark)').matches);
+  var t=dark?'light':'dark'; r.dataset.theme=t;
+  document.cookie='as_theme='+t+';path=/;max-age=31536000;samesite=lax';
+  return false;
+}
+</script>
+{{end}}
+
+{{define "themebtn"}}<a class="theme-btn" href="/theme?back={{.Path}}" onclick="return toggleTheme()" title="Switch light / dark" aria-label="Switch light or dark theme">◐</a>{{end}}
+
+{{define "top"}}
+<div class="top">
+  <a class="logo" href="{{if .SignedIn}}/dashboard{{else}}/{{end}}"><img src="/static/img/logo.png" width="28" height="28" alt=""><span class="wm">agent<span>stats</span></span></a>
+  <nav>
+    {{if .SignedIn}}
+      <a href="/dashboard"{{if eq .Path "/dashboard"}} class="on"{{end}}>Dashboard</a>
+      <a href="/badges"{{if eq .Path "/badges"}} class="on"{{end}}>Badges</a>
+      <a href="/leaderboard"{{if eq .Path "/leaderboard"}} class="on"{{end}}>Leaderboard</a>
+      <a href="/settings"{{if eq .Path "/settings"}} class="on"{{end}}>Settings</a>
+    {{else}}
+      <a href="/leaderboard"{{if eq .Path "/leaderboard"}} class="on"{{end}}>Leaderboard</a>
+      <a href="/methodology"{{if eq .Path "/methodology"}} class="on"{{end}}>Methodology</a>
+    {{end}}
+  </nav>
+  <div class="top-right">
+    {{template "themebtn" .}}
+    {{if .SignedIn}}
+      <details class="menu">
+        <summary class="chip">@{{.Me}} ▾</summary>
+        <div class="menu-pop">
+          <a href="/u/{{.Me}}">Public profile</a>
+          <a href="/share/{{.Me}}">Share previews</a>
+          <a href="/u/{{.Me}}/status">Analysis status</a>
+          <a href="/methodology">Methodology</a>
+          <form method="post" action="/auth/logout"><button class="linklike">Sign out</button></form>
+        </div>
+      </details>
+    {{else}}
+      <a class="btn primary sm" href="/auth/login">Sign in with GitHub</a>
+    {{end}}
+  </div>
+</div>
+{{end}}
+
+{{define "sitefooter"}}
+{{template "houseads" .}}
+<footer class="site"><span>agentstats by <a href="{{.Deemwar}}"><b>deemwar</b></a> · open source</span><span><a href="/methodology#privacy">Privacy</a> · <a href="/methodology">Methodology</a> · <a href="https://github.com/deemwar-products/agentstats">Source on GitHub</a></span></footer>
+{{end}}
+
+{{define "copyscript"}}
+<script>
+function copyText(text, el){
+  navigator.clipboard.writeText(text).then(function(){
+    var old = el.innerHTML; el.textContent = 'Copied';
+    setTimeout(function(){ el.innerHTML = old; }, 1200);
+  });
+  return false;
+}
+function copyPre(id, el){ return copyText(document.getElementById(id).innerText, el); }
+</script>
+{{end}}

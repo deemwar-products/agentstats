@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}{{ login }} — agentstats{% endblock %}
+{% block head %}
+<meta property="og:title" content="{{ login }} — before agents vs after agents">
+<meta property="og:image" content="{{ site }}/og/{{ login }}.png">
+{% endblock %}
+{% block content %}
+<h1>{{ login }}</h1>
+
+<img class="card-img" src="/card/{{ login }}/before-after.svg" alt="before agents vs after agents, for {{ login }}" width="800">
+<img class="card-img" src="/card/{{ login }}/composition.svg" alt="what {{ login }}'s code is made of" width="800">
+
+<h2>Badge</h2>
+<p><img src="/badge/{{ login }}.svg" alt="agentstats badge for {{ login }}"></p>
+
+<h2>Embed in your README</h2>
+<pre>[![agentstats]({{ badge_url }})]({{ site }}/u/{{ login }})
+![before and after agents]({{ before_after_url }})</pre>
+
+<p class="muted">If this is you, sign in to refresh (once a day), change your agent-era start, exclude repos, or delete all your data.</p>
+{% endblock %}

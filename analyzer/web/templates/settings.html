@@ -1,0 +1,47 @@
+{{define "settings.html"}}{{template "htmlopen" .}}
+<head>
+{{template "head" .}}
+<title>Settings · agentstats</title>
+</head>
+<body>
+<div class="wrap">
+{{template "top" .}}
+<h2>Settings &amp; privacy</h2>
+
+<form method="post" action="/api/settings" class="grid2">
+  <div class="panel">
+    <div class="kicker">Your card</div>
+    <div class="field mt10"><label for="agent_start">Agent era starts</label>
+      <label class="check"><input type="checkbox" name="agent_auto" {{if eq .User.AgentStart "auto"}}checked{{end}}>
+        <span><b>Detect from my history</b><br><span class="faint small">We find the AI release after which your monthly output rose the most.</span></span></label>
+      <input type="month" id="agent_start" name="agent_start" value="{{if ne .User.AgentStart "auto"}}{{.User.AgentStart}}{{end}}" pattern="\d{4}-\d{2}">
+      <p class="faint small">Or pick the month yourself (untick the box above). It takes effect on your next analysis.</p></div>
+    <div class="field"><label for="excluded_repos">Leave these repos out</label>
+      <textarea id="excluded_repos" name="excluded_repos" rows="4" placeholder="owner/repo, one per line">{{range .User.ExcludedRepos}}{{.}}
+{{end}}</textarea>
+      <p class="faint small">Excluded repos don't count toward any total.</p></div>
+    <button class="btn accent" type="submit">Save settings</button>
+  </div>
+  <div class="panel">
+    <div class="kicker">Visibility</div>
+    <label class="check mt10"><input type="checkbox" name="is_public" {{if .User.IsPublic}}checked{{end}}>
+      <span><b>Public profile</b><br><span class="faint small">When off, your cards show a placeholder and <code>/u/{{.User.Login}}</code> shows nothing to others.</span></span></label>
+    <label class="check"><input type="checkbox" name="notify_email" {{if .User.NotifyEmail}}checked{{end}}>
+      <span><b>Email me when an analysis finishes</b><br><span class="faint small">Uses your primary GitHub email, only if you opt in.</span></span></label>
+    <label class="check"><input type="checkbox" name="leaderboard" {{if .User.Leaderboard}}checked{{end}}>
+      <span><b>Show me on the leaderboard</b><br><span class="faint small">On by default. Only your login, tier and totals are shown; private repo names never are. A private profile is never ranked.</span></span></label>
+  </div>
+</form>
+
+<div class="panel gap danger-zone">
+  <div><div class="kicker">Delete all my data</div>
+    <p class="muted small">Removes your profile, stats, badges and every rendered card immediately. This cannot be undone. You can also revoke the app on GitHub.</p></div>
+  <form method="post" action="/api/delete" onsubmit="return confirm('Delete all your agentstats data? This cannot be undone.')">
+    <button class="btn danger" type="submit">Delete everything</button>
+  </form>
+</div>
+
+{{template "sitefooter" .}}
+</div>
+</body>
+</html>{{end}}

@@ -1,0 +1,59 @@
+# agentstats front Worker — Cloudflare config. NO SECRETS IN THIS FILE (repo is public).
+#
+# Per doc 12 the whole backend is ONE Go container; this Worker only routes:
+#   - /badge/* /card/* /og/*  -> R2 (edge-cached, no container wake)
+#   - /_internal/d1           -> D1 BINDING (doc 13 fix 1: no REST-API rate limit)
+#   - everything else         -> the Go container
+# Front worker is plain JavaScript (no build step) — see worker/index.js for why.
+#
+# Secrets set out-of-band with `wrangler secret put` (from `sec`), never committed:
+#   GITHUB_APP_ID          – the GitHub App's numeric id            (container)
+#   GITHUB_CLIENT_ID       – the App's OAuth client id              (container)
+#   GITHUB_CLIENT_SECRET   – the App's OAuth client secret          (container)
+#   GITHUB_APP_PRIVATE_KEY – PEM, for installation tokens           (container)
+#   SESSION_KEY            – 32+ random bytes, HMAC session key     (container)
+#   INTERNAL_D1_SECRET     – shared secret guarding /_internal/d1   (BOTH worker + container)
+#   (no R2 key: the container writes R2 through the Worker route /_internal/r2)
+#
+# All set via `wrangler secret put` from sec (GitHub App agentstats-by-deemwar exists; manifest
+# flow, docs 05) and the R2 token is minted. Placeholders elsewhere are OBVIOUSLY fake.
+
+name = "agentstats"
+main = "index.js"                     # plain JS module; NO build step
+compatibility_date = "2026-09-01"
+compatibility_flags = ["nodejs_compat"]
+
+routes = [{ pattern = "agentstats.deemwar.com", custom_domain = true }]
+workers_dev = true
+
+[vars]
+SITE_URL = "https://agentstats.deemwar.com"
+
+# D1 lives on the WORKER (binding has no REST-API rate limit). The container
+# reaches it only through the /_internal/d1 route (doc 13 fix 1).
+[[d1_databases]]
+binding = "DB"
+database_name = "agentstats"
+database_id = "34357a97-220d-4b8b-8c4f-107925f9e479"
+migrations_dir = "../migrations"
+
+# Pre-rendered cards/badges. The Worker streams these; the Go container writes them.
+[[r2_buckets]]
+binding = "CARDS"
+bucket_name = "agentstats-cards"
+
+# The Go analyzer/web container = the whole backend. Requires the Workers Paid
+# plan (confirm on the account). max_instances is the COST CEILING (doc 13).
+[[containers]]
+class_name = "Analyzer"
+image = "../analyzer/Dockerfile"
+instance_type = "standard-2"
+max_instances = 5
+
+[[durable_objects.bindings]]
+name = "CONTAINER"
+class_name = "Analyzer"
+
+[[migrations]]
+tag = "v1"
+new_sqlite_classes = ["Analyzer"]

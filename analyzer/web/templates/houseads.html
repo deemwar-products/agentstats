@@ -1,0 +1,28 @@
+{{define "houseads"}}
+<style>
+.house{margin:40px 0 0;border-top:1px solid var(--line);padding-top:18px}
+.house .kicker{margin-bottom:10px}
+.house-grid{display:grid;grid-template-columns:1.4fr 1fr;gap:12px}
+@media(max-width:720px){.house-grid{grid-template-columns:1fr}}
+.house a.ad{display:block;text-decoration:none;color:inherit;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px 16px;transition:border-color .15s}
+.house a.ad:hover{border-color:var(--ink-3)}
+.house a.ad b{display:block;font-size:15px;letter-spacing:-.01em}
+.house a.ad span{display:block;font-size:13px;color:var(--ink-2);margin-top:3px}
+.house a.ad em{font-style:normal;font-size:12.5px;font-weight:600;color:var(--accent);display:inline-block;margin-top:8px}
+</style>
+<aside class="house" aria-label="From deemwar">
+  <div class="kicker">From deemwar, who built agentstats</div>
+  <div class="house-grid">
+    <a class="ad" href="https://cli.deemwar.com/?utm_source=agentstats&amp;utm_medium=house-ad&amp;utm_campaign=cross-promo">
+      <b>Make your API agent-ready in one week</b>
+      <span>We turn your API into a CLI, agent skills and an MCP server, with an engineer embedded on your team for 5 days.</span>
+      <em>cli.deemwar.com →</em>
+    </a>
+    <a class="ad" href="https://atoms.deemwar.com/?utm_source=agentstats&amp;utm_medium=house-ad&amp;utm_campaign=cross-promo">
+      <b>Give your software a phone line</b>
+      <span>CallBox: your own SIM in a small box, so your agent makes and answers real calls at a flat monthly cost.</span>
+      <em>atoms.deemwar.com →</em>
+    </a>
+  </div>
+</aside>
+{{end}}

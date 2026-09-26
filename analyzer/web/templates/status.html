@@ -1,0 +1,16 @@
+{{define "status.html"}}{{template "htmlopen" .}}
+<head>
+{{template "head" .}}
+<title>Analyzing @{{.Login}} · agentstats</title>
+{{if .Polling}}<noscript><meta http-equiv="refresh" content="5"></noscript>{{end}}
+</head>
+<body>
+<div class="wrap">
+{{template "top" .}}
+<div class="panel narrow">
+  {{template "job_status.html" .}}
+</div>
+{{template "sitefooter" .}}
+</div>
+</body>
+</html>{{end}}

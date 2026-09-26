@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block title %}{{ login }} — analyzing…{% endblock %}
+{% block head %}
+<meta http-equiv="refresh" content="5">
+{% endblock %}
+{% block content %}
+<h1>Analyzing {{ login }}'s history…</h1>
+<p class="muted">Cloning your repositories, counting the code you wrote, and rendering your cards. This page
+refreshes itself every 5 seconds — no need to reload.</p>
+<p class="muted">Analysis cost scales with the size of your history, not with visitors. When it's done you'll land on your profile.</p>
+{% endblock %}

@@ -1,0 +1,44 @@
+{{define "landing.html"}}{{template "htmlopen" .}}
+<head>
+{{template "head" .}}
+<title>agentstats: before agents vs after agents</title>
+<meta name="description" content="Your code before and after AI agents, from your GitHub history. Imports and generated code left out. Open source.">
+<meta property="og:title" content="agentstats: how much code did you really write since agents?">
+<meta property="og:description" content="Honest before-vs-after-agents stats from your GitHub history. Open source, read-only.">
+</head>
+<body>
+<div class="wrap">
+{{template "top" .}}
+
+<div class="land">
+  <div class="kicker">Open source · read-only</div>
+  <h1>How much code did you really write since agents?</h1>
+  <p class="muted lead">Sign in with GitHub. See your lines before and after AI agents, with imports and generated code left out.</p>
+  <div class="cta-row">
+    <a class="btn accent" href="/auth/login">Sign in with GitHub</a>
+    <a class="btn ghost" href="{{.View.Repo}}">View the source</a>
+  </div>
+  <p class="faint small trust">We keep numbers, never code. Delete anytime.</p>
+</div>
+
+{{with .View.Sample}}
+<div class="land-example">
+  <div class="ex-top"><span class="live"><i></i> A real one, live data</span><a href="/u/{{$.View.Featured}}">See @{{$.View.Featured}}'s full dashboard →</a></div>
+  <a class="card-link" href="/u/{{$.View.Featured}}">
+  <div class="card1">
+    <div class="kicker">{{.Kicker}}</div>
+    <h2 class="h-card">{{.Headline}}</h2>
+    <div class="grid2 keep2">
+      <div class="era"><div class="lbl">{{.Before.Label}}</div><div class="span">{{.Before.Span}}</div><div class="big">{{.Before.Big}}</div><div class="sub">lines of code</div></div>
+      <div class="era after"><div class="lbl">{{.After.Label}}</div><div class="span">{{.After.Span}}</div><div class="big">{{.After.Big}}</div><div class="sub">lines of code</div></div>
+    </div>
+    <div class="foot"><span>{{.Excluded}} lines of imports &amp; generated code excluded</span><b>agentstats by deemwar</b></div>
+  </div>
+  </a>
+</div>
+{{end}}
+
+{{template "sitefooter" .}}
+</div>
+</body>
+</html>{{end}}

@@ -1,0 +1,64 @@
+{{define "share.html"}}{{template "htmlopen" .}}
+<head>
+{{template "head" .}}
+<title>Share previews for @{{.Login}} · agentstats</title>
+{{if not .Private}}
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="agentstats by deemwar">
+<meta property="og:title" content="{{.Name}}: before agents vs after agents">
+<meta property="og:description" content="{{if .Headline}}{{.Headline}} Imports and generated code excluded.{{else}}An honest before/after card of the code they actually wrote.{{end}}">
+<meta property="og:image" content="{{.OGImage}}">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:url" content="{{.ProfileURL}}">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="{{.Name}}: before agents vs after agents">
+<meta name="twitter:description" content="{{if .Headline}}{{.Headline}}{{else}}An honest before/after card of the code they actually wrote.{{end}}">
+<meta name="twitter:image" content="{{.OGImage}}">
+{{end}}
+</head>
+<body>
+<div class="wrap">
+{{template "top" .}}
+{{if .Private}}
+  <div class="panel narrow center"><h2>This profile is private</h2><p class="muted">There is nothing to preview.</p></div>
+{{else if not .HasStats}}
+  <div class="panel narrow center"><h2>No card yet</h2><p class="muted">@{{.Login}} hasn't been analyzed, so there is no preview image.</p></div>
+{{else}}
+  <div class="kicker">What people see when you share /u/{{.Login}}</div>
+  <h2>Share previews <span class="faint h-note">og:image 1200×630</span></h2>
+  <div class="socials">
+    <div class="post">
+      <div class="hd"><i></i><div><b>{{.Name}}</b><div class="faint small">LinkedIn · now</div></div></div>
+      <div class="tx">{{.LinkedInText}}</div>
+      <div class="og-img"><img src="{{.OGPath}}" alt="Share card for @{{.Login}}" width="1200" height="630" loading="lazy"></div>
+      <div class="meta">{{.Site}}</div>
+    </div>
+    <div class="post">
+      <div class="hd"><i></i><div><b>{{.Name}}</b> <span class="faint">@{{.Login}} · 1m</span></div></div>
+      <div class="tx">{{.XText}}</div>
+      <div class="og-img rounded"><img src="{{.OGPath}}" alt="Share card for @{{.Login}}" width="1200" height="630" loading="lazy"></div>
+      <div class="meta">From {{.Site}}</div>
+    </div>
+    <div class="post wa">
+      <div class="bubble">
+        <div class="og-img"><img src="{{.OGPath}}" alt="Share card for @{{.Login}}" width="1200" height="630" loading="lazy"></div>
+        <div class="t"><b>{{.WhatsAppTitle}}</b><small>{{.Site}}</small>check this out 👇 {{.ProfileURL}}</div>
+      </div>
+    </div>
+  </div>
+  <div class="panel sharebar gap">
+    <b>Share it</b>
+    <div class="share">
+      <a href="{{.Links.LinkedIn}}" target="_blank" rel="noopener"><i style="background:#0a66c2"></i>LinkedIn</a>
+      <a href="{{.Links.X}}" target="_blank" rel="noopener"><i class="x"></i>X</a>
+      <a href="{{.Links.WhatsApp}}" target="_blank" rel="noopener"><i style="background:#25d366"></i>WhatsApp</a>
+      <a href="{{.ProfileURL}}" onclick="return copyText('{{.ProfileURL}}', this)"><i style="background:var(--ink-3)"></i>Copy link</a>
+    </div>
+  </div>
+{{end}}
+{{template "sitefooter" .}}
+</div>
+{{template "copyscript" .}}
+</body>
+</html>{{end}}

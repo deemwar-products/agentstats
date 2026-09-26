@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block title %}agentstats — methodology{% endblock %}
+{% block content %}
+<h1>How the counting works</h1>
+<p class="muted">The single source of truth for these rules is <code>analyzer/rules.go</code>; this page mirrors it.</p>
+
+<h2>What counts</h2>
+<ul>
+  <li><strong>Author</strong> = your verified GitHub emails (plus your <code>noreply</code> address). Commits are deduped by SHA across every repo and fork. <code>--all --no-merges</code>.</li>
+  <li><strong>Lines</strong> = <em>added</em> lines from <code>git log --numstat</code>, code languages only (by extension).</li>
+</ul>
+
+<h2>What is excluded</h2>
+<ul>
+  <li><strong>Paths</strong>: <code>node_modules/ vendor/ dist/ build/ target/ .next/ coverage/ bower_components/ out/ __pycache__/ Pods/ .gradle/ venv/ .venv/</code>, any <code>*aot/</code> dir, anything vendored, anything containing <code>generated</code>.</li>
+  <li><strong>Files</strong>: lock files, <code>*.min.js|css</code>, <code>*.map</code>, <code>*.snap</code>, <code>*.svg</code>, <code>*.lock</code>, <code>*.csv|tsv|txt|log</code>, <code>*.pb.go</code>, <code>*_pb2.py</code>, <code>*.g.dart</code>.</li>
+  <li><strong>Non-code</strong>: JSON, XML, Markdown, YAML, TOML and notebooks are not counted as code.</li>
+  <li><strong>Per file</strong>: a single file adding more than 5,000 lines is skipped.</li>
+  <li><strong>Per commit</strong>: a commit touching more than 300 files or adding more than 25,000 lines is dropped whole (bulk import) — and every dropped commit is listed on your card.</li>
+</ul>
+
+<h2>What we can't see</h2>
+<p>Time in a chat or an agent session never reaches git, and unsigned agent code looks like human code — so
+the card says <strong>at least</strong> N% agent-signed, never "N% AI".</p>
+
+<h2>AI release timeline</h2>
+<p class="muted">Ticks on the monthly chart. <strong>These dates are unverified drafts</strong> — each still needs a
+vendor-announcement source before launch (see the repo's docs 09).</p>
+<pre>{{ milestones_json }}</pre>
+{% endblock %}

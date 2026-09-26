@@ -1,0 +1,69 @@
+{{define "repos.html"}}{{template "htmlopen" .}}
+<head>
+{{template "head" .}}
+<title>Choose repos · agentstats</title>
+</head>
+<body>
+<div class="wrap">
+{{template "top" .}}
+
+<div class="kicker">Step 2 of 2</div>
+<h2 style="margin-bottom:6px">Choose the repos to count</h2>
+<p class="muted" style="margin-top:0">We found <b>{{.Total}}</b> repos you can read. Your <b>{{.Public}}</b> public repos are selected. Tick private ones too if you want them counted: they only add to your totals and their names are never shown. Only your own commits count, and the code is thrown away after counting.
+Missing an organization? <a href="{{.InstallURL}}">Install the app on it</a>, then come back.</p>
+
+{{if .None}}<p class="note" role="alert">Pick at least one repo.</p>{{end}}
+
+<form method="post" action="/repos" id="pick">
+  <div class="picker-bar panel">
+    <input type="search" id="q" placeholder="Filter repos…" aria-label="Filter repos" autocomplete="off">
+    <div class="seg" role="group" aria-label="Visibility">
+      <button type="button" class="on" data-vis="all">All</button><button type="button" data-vis="public">Public</button><button type="button" data-vis="private">Private</button>
+    </div>
+    <div class="picker-actions">
+      <button type="button" class="btn ghost sm" data-all="1">Select all</button>
+      <button type="button" class="btn ghost sm" data-all="0">Select none</button>
+      <button type="submit" class="btn accent" id="go">Analyze <span id="count">{{.Public}}</span> repos</button>
+    </div>
+  </div>
+
+  {{range .Groups}}
+  <section class="panel picker-group">
+    <label class="picker-owner"><input type="checkbox" class="owner-toggle" checked> <b>{{.Owner}}</b> <span class="faint small">{{len .Repos}} repos</span></label>
+    <ul class="picker-list">
+      {{range .Repos}}
+      <li data-name="{{.FullName}}" data-vis="{{if .Private}}private{{else}}public{{end}}">
+        <label><input type="checkbox" name="repo" value="{{.FullName}}"{{if not .Private}} checked{{end}}>
+          <span class="picker-name">{{.Name}}</span>
+          {{if .Private}}<span class="tag">private</span>{{end}}
+          <span class="faint small picker-date">{{.Pushed}}</span></label>
+      </li>
+      {{end}}
+    </ul>
+  </section>
+  {{end}}
+</form>
+
+{{template "sitefooter" .}}
+</div>
+<script>
+(function(){
+  var form=document.getElementById('pick'),q=document.getElementById('q'),count=document.getElementById('count'),go=document.getElementById('go');
+  function boxes(){return form.querySelectorAll('input[name=repo]');}
+  function update(){var n=form.querySelectorAll('input[name=repo]:checked').length;count.textContent=n;go.disabled=n===0;
+    form.querySelectorAll('.picker-group').forEach(function(g){var all=g.querySelectorAll('input[name=repo]'),on=g.querySelectorAll('input[name=repo]:checked');var t=g.querySelector('.owner-toggle');t.checked=on.length===all.length;t.indeterminate=on.length>0&&on.length<all.length;});}
+  form.addEventListener('change',function(e){if(e.target.classList.contains('owner-toggle')){e.target.closest('.picker-group').querySelectorAll('li:not([hidden]) input[name=repo]').forEach(function(b){b.checked=e.target.checked;});}update();});
+  form.querySelectorAll('[data-all]').forEach(function(b){b.addEventListener('click',function(){var v=b.getAttribute('data-all')==='1';form.querySelectorAll('li:not([hidden]) input[name=repo]').forEach(function(x){x.checked=v;});update();});});
+  var vis='all'; // the list starts showing everything; public repos are pre-ticked
+  function applyFilter(){var t=q.value.toLowerCase();form.querySelectorAll('li[data-name]').forEach(function(li){li.hidden=(t&&li.getAttribute('data-name').toLowerCase().indexOf(t)<0)||(vis!=='all'&&li.getAttribute('data-vis')!==vis);});
+    form.querySelectorAll('.picker-group').forEach(function(g){g.hidden=!g.querySelector('li:not([hidden])');});}
+  q.addEventListener('input',applyFilter);
+  form.querySelectorAll('[data-vis]').forEach(function(b){if(b.tagName!=='BUTTON')return;b.addEventListener('click',function(){vis=b.getAttribute('data-vis');form.querySelectorAll('button[data-vis]').forEach(function(x){x.classList.toggle('on',x===b);});
+    // selecting a visibility also selects exactly those repos
+    form.querySelectorAll('li[data-name] input[name=repo]').forEach(function(x){var li=x.closest('li');x.checked=vis==='all'||li.getAttribute('data-vis')===vis;});applyFilter();update();});});
+  update();
+})();
+</script>
+</body>
+</html>
+{{end}}

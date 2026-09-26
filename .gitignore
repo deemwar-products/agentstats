@@ -1,0 +1,23 @@
+# build artifacts
+analyzer/bin/
+node_modules/
+dist/
+.wrangler/
+*.log
+
+# Rust worker build output
+worker/target/
+target/
+worker/build/
+build/worker/
+
+# local analyzer scratch / cloned repos
+prototype/stats.json
+prototype/repomonth.json
+*.git-clones/
+
+# secrets — never commit
+.dev.vars
+.env
+*.env
+wrangler.toml.local

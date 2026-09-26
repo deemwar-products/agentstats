@@ -1,0 +1,54 @@
+{{define "badges.html"}}{{template "htmlopen" .}}
+<head>
+{{template "head" .}}
+<title>Make a badge · agentstats</title>
+</head>
+<body>
+<div class="wrap">
+{{template "top" .}}
+<h2>Make a badge</h2>
+<div class="builder">
+  <form class="panel" id="bform" method="post" action="/api/badges"
+        hx-get="/api/badge-preview" hx-target="#bPreview" hx-swap="innerHTML"
+        hx-trigger="change, keyup changed delay:300ms from:#bLabel">
+    <div class="field"><label for="bMetric">Metric</label>
+      <select id="bMetric" name="metric">{{range .Metrics}}<option value="{{.Value}}">{{.Label}}</option>{{end}}</select></div>
+    <div class="field"><label>Style</label><div class="seg">
+      {{range $i, $o := .Styles}}<label><input type="radio" name="style" value="{{$o.Value}}"{{if eq $i 0}} checked{{end}}><span>{{$o.Label}}</span></label>{{end}}</div></div>
+    <div class="field"><label>Theme</label><div class="seg">
+      {{range $i, $o := .Themes}}<label><input type="radio" name="theme" value="{{$o.Value}}"{{if eq $i 0}} checked{{end}}><span>{{$o.Label}}</span></label>{{end}}</div></div>
+    <div class="field"><label for="bLabel">Label</label><input type="text" id="bLabel" name="label" placeholder="agent era" maxlength="24"></div>
+    <div class="field"><label>Period</label><div class="seg">
+      <label><input type="radio" name="period" value="all" checked><span>all time</span></label>
+      <label><input type="radio" name="period" value="year"><span>this year</span></label>
+      <label><input type="radio" name="period" value="90d"><span>last 90 days</span></label></div></div>
+    <button class="btn accent block" type="submit">Save badge</button>
+    {{if not .HasStats}}<p class="faint small mt12">Previewing against sample numbers until your analysis finishes.</p>{{end}}
+  </form>
+  <div class="panel">
+    <div class="kicker">Live preview</div>
+    <div class="preview mt10" id="bPreview"><div class="badge-preview">{{.Preview}}</div></div>
+    <div class="snip-row"><b class="small">Markdown</b><a class="btn ghost sm" href="#" onclick="return copyPre('bSnip', this)">Copy</a></div>
+    <pre class="snip" id="bSnip">[![agentstats]({{.Site}}/badge/{{.Login}}.svg)]({{.Site}}/u/{{.Login}})</pre>
+    <div class="snip-row"><b class="small">HTML</b><a class="btn ghost sm" href="#" onclick="return copyPre('bHtml', this)">Copy</a></div>
+    <pre class="snip" id="bHtml">&lt;a href="{{.Site}}/u/{{.Login}}"&gt;&lt;img src="{{.Site}}/badge/{{.Login}}.svg" alt="agentstats"&gt;&lt;/a&gt;</pre>
+    <p class="faint small mt10">Save a badge to get its own permanent URL with the metric, style and label you picked. Saved badges refresh after every re-analysis.</p>
+    <h3 class="mt22">Your badges</h3>
+    {{if .Badges}}
+      {{range .Badges}}
+      <div class="saved">
+        <div class="saved-svg">{{.SVG}}</div>
+        <pre class="snip" id="s-{{.ID}}">{{.Markdown}}</pre>
+        <a class="btn ghost sm" href="#" onclick="return copyPre('s-{{.ID}}', this)">Copy</a>
+      </div>
+      {{end}}
+    {{else}}
+      <p class="muted small">No saved badges yet.</p>
+    {{end}}
+  </div>
+</div>
+{{template "sitefooter" .}}
+</div>
+{{template "copyscript" .}}
+</body>
+</html>{{end}}

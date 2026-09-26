@@ -1,0 +1,100 @@
+{{define "tierpill"}}<span class="tier t{{.Level}}">{{.Name}}</span>{{end}}
+
+{{define "lbshare"}}<div class="share">
+  <a href="{{.Links.LinkedIn}}" target="_blank" rel="noopener"><i style="background:#0a66c2"></i>LinkedIn</a>
+  <a href="{{.Links.X}}" target="_blank" rel="noopener"><i class="x"></i>X</a>
+  <a href="{{.Links.WhatsApp}}" target="_blank" rel="noopener"><i style="background:#25d366"></i>WhatsApp</a>
+  <a href="{{.ProfileURL}}" onclick="return copyText('{{.ProfileURL}}', this)"><i style="background:var(--ink-3)"></i>Copy link</a>
+</div>{{end}}
+
+{{define "leaderboard.html"}}{{template "htmlopen" .}}
+<head>
+{{template "head" .}}
+<title>Leaderboard · agentstats</title>
+<meta name="description" content="Developers ranked on honest line counts, before vs after coding agents.">
+</head>
+<body>
+<div class="wrap">
+{{template "top" .}}
+<div class="kicker">Everyone who's analyzed · public by default</div>
+<h2 class="lb-title">Leaderboard</h2>
+<p class="muted lb-lead">{{.Total}} developer{{if ne .Total 1}}s{{end}} ranked on honest counts. Your tier is how much your pace changed after agents, the same on every board. You can hide yourself in <a href="/settings">Settings</a>.</p>
+
+<div class="levels">{{range .Tiers}}
+  <a class="lvl{{if .On}} on{{end}}" href="{{.Href}}">{{template "tierpill" .T}}<span>{{.T.Rule}} · {{.Count}} {{if eq .Count 1}}person{{else}}people{{end}}</span></a>
+{{end}}</div>
+
+{{if .Mine}}{{with .Mine}}
+<div class="me-strip">
+  <div><div class="small dim">Your rank · {{.Board}}</div><div class="big">#{{.Row.Rank}} <small>of {{.Of}}</small></div></div>
+  {{template "tierpill" .Row.Tier}}
+  <div class="grow"></div>
+  {{template "lbshare" .}}
+</div>
+{{end}}{{else if .SignedIn}}
+<div class="me-strip">
+  <div><div class="small dim">Your rank · {{.Board.Label}}</div><div class="note-txt">{{if .MeNote}}{{.MeNote}}{{else}}You're not on this board yet.{{end}}</div></div>
+  <div class="grow"></div>
+  {{if .MeLink}}<a class="btn accent sm" href="{{.MeLink}}">{{.MeLinkT}} →</a>{{end}}
+</div>
+{{else}}
+<div class="me-strip">
+  <div><div class="big cta">Where would you rank?</div><div class="small dim">Sign in with GitHub, pick your repos, see your honest before/after in a few minutes.</div></div>
+  <div class="grow"></div>
+  <a class="btn accent" href="/auth/login">See yours →</a>
+</div>
+{{end}}
+
+<div class="tabs lb-tabs">{{range .Boards}}<a href="{{.Href}}"{{if .On}} class="on"{{end}}>{{.Label}}</a>{{end}}</div>
+<form class="lb-search" method="get" action="/leaderboard" role="search">
+  {{if ne .Board.Slug "shift"}}<input type="hidden" name="board" value="{{.Board.Slug}}">{{end}}
+  {{if .Tier}}<input type="hidden" name="tier" value="{{.Tier}}">{{end}}
+  <input type="search" id="lb-q" name="q" value="{{.Q}}" placeholder="Search a developer…" autocomplete="off" aria-label="Search a developer">
+</form>
+
+<div class="lb-list">
+  <table>
+    <thead><tr><th class="rank">#</th><th>Developer</th><th>Tier</th><th class="num">Before / mo</th><th class="num">After / mo</th><th class="num">{{.Board.Label}}</th></tr></thead>
+    <tbody id="lb-rows">
+    {{range .Rows}}
+    <tr class="row{{if eq .Login $.Me}} me{{end}}" data-href="/u/{{.Login}}" data-q="{{.Login}} {{.Name}}">
+      <td class="rank">{{.Rank}}</td>
+      <td class="dev">{{if .AvatarURL}}<img class="av" src="{{.AvatarURL}}" alt="" loading="lazy">{{else}}<span class="av" style="background:{{.AvatarColor}}">{{.Initial}}</span>{{end}}<a href="/u/{{.Login}}"><b>{{.Login}}</b></a>{{if eq .Login $.Me}} <span class="faint small">you</span>{{end}}</td>
+      <td>{{template "tierpill" .Tier}}</td>
+      <td class="num">{{.BeforeMoTxt}}</td>
+      <td class="num">{{.AfterMoTxt}}</td>
+      <td class="num"><b>{{.Value}}</b></td>
+    </tr>
+    {{end}}
+    <tr id="lb-none"{{if .Rows}} hidden{{end}}><td colspan="6" class="empty">
+      {{if .Total}}<b>No one matches that search</b><span class="muted">Try another name{{if .Tier}}, or <a href="{{.ClearTier}}">show every tier</a>{{end}}.</span>
+      {{else}}<b>Nobody ranked yet</b><span class="muted">Everyone who analyzes their history shows up here.</span>{{if not .SignedIn}}<a class="btn primary sm" href="/auth/login">Sign in with GitHub</a>{{end}}{{end}}
+    </td></tr>
+    </tbody>
+  </table>
+</div>
+<p class="faint small mt10">"Biggest shift" needs 2+ years and 5K+ lines of history before agents; below that you're "new here" with no multiplier. Before / after are counted lines per month in each era.</p>
+<p class="faint small">Tiers go by how much your pace changed after agents: under 1.5×, 1.5–3×, 3–8×, 8–20×, 20×+. We measure output, not workflow.</p>
+{{template "sitefooter" .}}
+</div>
+{{template "copyscript"}}
+<script>
+(function(){
+  var rows = document.querySelectorAll('#lb-rows tr.row');
+  rows.forEach(function(tr){
+    tr.addEventListener('click', function(e){ if (!e.target.closest('a')) location.href = tr.dataset.href; });
+  });
+  var q = document.getElementById('lb-q'), none = document.getElementById('lb-none');
+  if (!q) return;
+  q.addEventListener('input', function(){
+    var v = q.value.trim().toLowerCase(), shown = 0;
+    rows.forEach(function(tr){
+      var hit = !v || tr.dataset.q.toLowerCase().indexOf(v) >= 0;
+      tr.hidden = !hit; if (hit) shown++;
+    });
+    if (none && rows.length) none.hidden = shown > 0;
+  });
+})();
+</script>
+</body>
+</html>{{end}}
