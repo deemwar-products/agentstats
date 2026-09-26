@@ -396,3 +396,10 @@ a.brandlink{text-decoration:none;color:inherit}
 .land .btn svg{flex:none}
 .trust-icons{display:flex;justify-content:center;gap:18px;flex-wrap:wrap;margin-top:14px}
 .trust-icons span{display:inline-flex;align-items:center;gap:5px;cursor:help}
+
+/* icon-only share buttons */
+.share.icons{gap:6px;align-items:center}
+.share.icons a.ib{width:36px;height:36px;padding:0;justify-content:center;border-radius:50%;color:var(--ink)}
+.share.icons a.ib:hover{border-color:var(--ink-3);transform:translateY(-1px)}
+.share.icons a.ib.done{border-color:var(--good);color:var(--good)}
+.me-strip .share.icons a.ib{color:var(--dark-ink)}
