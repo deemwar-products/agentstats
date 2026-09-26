@@ -385,3 +385,11 @@ a.brandlink{text-decoration:none;color:inherit}
 .land-example .live i{width:7px;height:7px;border-radius:50%;background:var(--good)}
 .land-example a.card-link{display:block;text-decoration:none;color:inherit}
 .land-example a.card-link:hover .card1{border-color:var(--ink-3)}
+
+/* release badges + era edit */
+.chart .rel{cursor:help}
+.rel-legend{margin:6px 0 0;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.rel-legend .vb{display:inline-grid;place-items:center;width:14px;height:14px;border-radius:50%;color:#fff;font-size:8.5px;font-weight:800}
+.tools-row .more{font-size:11px;font-weight:600;color:var(--ink-3);border:1px solid var(--line);border-radius:999px;padding:0 5px;cursor:help}
+.edit-ico{display:inline-flex;vertical-align:-2px;margin-left:4px;color:var(--ink-3);padding:2px;border-radius:5px}
+.edit-ico:hover{color:var(--accent);background:var(--surface)}

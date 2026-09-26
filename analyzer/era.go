@@ -28,29 +28,41 @@ const (
 	eraMinRatio     = 1.5  // a release must lift the pace at least this much to count
 )
 
-// DetectEra picks the AI release after which the user's monthly output rose the most.
-// It uses nothing but their own counted lines per month and the release timeline, so it
-// works whether or not the agent signed any commits.
-func DetectEra(monthly map[string]int, ms []Milestone) EraPick {
+// ReleaseImpact is one release month scored the way DetectEra scores it: average monthly
+// lines in the eraAfterMonths from that month vs the eraBeforeMonths before it.
+type ReleaseImpact struct {
+	Month      string   // YYYY-MM
+	Tools      []string // every release that month, in timeline order
+	AfterPace  float64
+	BeforePace float64 // floored at eraPaceFloor
+	Ratio      float64 // rounded to 0.1
+	Eligible   bool    // enough months after it to judge
+}
+
+// ReleaseImpacts scores every release month inside the user's history. The dashboard's
+// release panel and DetectEra both use it, so the two always agree.
+func ReleaseImpacts(monthly map[string]int, ms []Milestone) []ReleaseImpact {
 	last := ""
 	for m := range monthly {
 		if m > last {
 			last = m
 		}
 	}
-	best := EraPick{Month: FallbackEra, Auto: true}
-	bestRatio := 0.0
-	seen := map[string]bool{}
-	sort.Slice(ms, func(i, j int) bool { return ms[i].Date < ms[j].Date })
-	for _, m := range ms {
+	sorted := append([]Milestone(nil), ms...)
+	sort.SliceStable(sorted, func(i, j int) bool { return sorted[i].Date < sorted[j].Date })
+	var out []ReleaseImpact
+	for _, m := range sorted {
 		if len(m.Date) < 7 || m.Date < "2021-06" {
 			continue
 		}
 		start := m.Date[:7]
-		if seen[start] || start > last {
+		if start > last {
 			continue
 		}
-		seen[start] = true
+		if n := len(out); n > 0 && out[n-1].Month == start {
+			out[n-1].Tools = append(out[n-1].Tools, m.Tool)
+			continue
+		}
 		after, n := 0, 0
 		for i := 0; i < eraAfterMonths; i++ {
 			mm := addMonths(start, i)
@@ -60,22 +72,32 @@ func DetectEra(monthly map[string]int, ms []Milestone) EraPick {
 			after += monthly[mm]
 			n++
 		}
-		if n < eraMinAfter {
-			continue
-		}
 		before := 0
 		for i := 1; i <= eraBeforeMonths; i++ {
 			before += monthly[addMonths(start, -i)]
 		}
-		afterPace := float64(after) / float64(n)
-		beforePace := max(float64(before)/eraBeforeMonths, eraPaceFloor)
-		ratio := afterPace / beforePace
-		if ratio > bestRatio {
-			bestRatio = ratio
-			best = EraPick{Month: start, Milestone: m.Tool, Ratio: round1(ratio), Auto: true}
+		ri := ReleaseImpact{Month: start, Tools: []string{m.Tool}, Eligible: n >= eraMinAfter,
+			BeforePace: max(float64(before)/eraBeforeMonths, eraPaceFloor)}
+		if n > 0 {
+			ri.AfterPace = float64(after) / float64(n)
+			ri.Ratio = round1(ri.AfterPace / ri.BeforePace)
+		}
+		out = append(out, ri)
+	}
+	return out
+}
+
+// DetectEra picks the AI release after which the user's monthly output rose the most.
+// It uses nothing but their own counted lines per month and the release timeline, so it
+// works whether or not the agent signed any commits.
+func DetectEra(monthly map[string]int, ms []Milestone) EraPick {
+	best := EraPick{Month: FallbackEra, Auto: true}
+	for _, ri := range ReleaseImpacts(monthly, ms) {
+		if ri.Eligible && ri.Ratio > best.Ratio {
+			best = EraPick{Month: ri.Month, Milestone: ri.Tools[0], Ratio: ri.Ratio, Auto: true}
 		}
 	}
-	if bestRatio < eraMinRatio {
+	if best.Ratio < eraMinRatio {
 		return EraPick{Month: FallbackEra, Auto: true}
 	}
 	return best
