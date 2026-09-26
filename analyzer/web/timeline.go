@@ -89,7 +89,7 @@ func addMonth(ym string, n int) string {
 // cumulativeChart draws total honest lines over the whole history as a line, with the AI
 // releases marked, and the agent-era boundary shaded.
 func cumulativeChart(st *analyzer.Stats, months []string, ms []analyzer.Milestone) (template.HTML, string) {
-	const W, H, padL, padR, padT, padB = 900.0, 300.0, 56.0, 16.0, 44.0, 28.0
+	const W, H, padL, padR, padT, padB = 900.0, 320.0, 56.0, 16.0, 76.0, 28.0
 	cum := make([]int, len(months))
 	run := 0
 	for i, m := range months {
@@ -122,11 +122,11 @@ func cumulativeChart(st *analyzer.Stats, months []string, ms []analyzer.Mileston
 	// agent-era shading
 	if i, ok := idx[st.AgentStart]; ok {
 		fmt.Fprintf(&b, `<rect x="%.1f" y="%.1f" width="%.1f" height="%.1f" fill="var(--accent)" opacity=".07"/>`, x(i), padT, W-padR-x(i), H-padT-padB)
-		fmt.Fprintf(&b, `<text x="%.1f" y="%.1f" font-size="11" font-weight="700" fill="var(--accent)">agent era →</text>`, x(i)+6, H-padB-8)
+		fmt.Fprintf(&b, `<text x="%.1f" y="%.1f" text-anchor="end" font-size="11" font-weight="700" fill="var(--accent)">agent era</text>`, W-padR-4, H-padB-8)
 	}
 	// release markers: one small vendor badge per release month, hover for the names.
-	// Badges go in up to three lanes so neighbouring months never overlap; only the
-	// release the agent era starts at gets a text label.
+	// Badges go in up to five lanes so neighbouring months don't overlap; the release the
+	// agent era starts at gets an accent ring.
 	type mark struct {
 		i     int
 		names []string
@@ -147,8 +147,8 @@ func cumulativeChart(st *analyzer.Stats, months []string, ms []analyzer.Mileston
 		}
 		marks = append(marks, mark{i, []string{m.Tool}, m.Date[:7]})
 	}
-	const r, gap = 7.0, 16.0
-	laneEnd := []float64{-1e9, -1e9, -1e9}
+	const r, gap = 6.0, 13.0
+	laneEnd := []float64{-1e9, -1e9, -1e9, -1e9, -1e9}
 	for _, mk := range marks {
 		xx := x(mk.i)
 		lane := 0
@@ -162,7 +162,7 @@ func cumulativeChart(st *analyzer.Stats, months []string, ms []analyzer.Mileston
 			}
 		}
 		laneEnd[lane] = xx
-		cy := 10 + float64(lane)*(2*r+3)
+		cy := 9 + float64(lane)*(2*r+2)
 		v := vendorOf(mk.names[0])
 		era := mk.date == st.AgentStart
 		tip := template.HTMLEscapeString(strings.Join(mk.names, " · ") + " · " + monthShort(mk.date))
@@ -173,13 +173,7 @@ func cumulativeChart(st *analyzer.Stats, months []string, ms []analyzer.Mileston
 			stroke = "var(--accent)"
 		}
 		fmt.Fprintf(&b, `<circle cx="%.1f" cy="%.1f" r="%.0f" fill="%s" stroke="%s" stroke-width="2"/>`, xx, cy, r, v.color, stroke)
-		fmt.Fprintf(&b, `<text x="%.1f" y="%.1f" text-anchor="middle" font-size="8.5" font-weight="800" fill="#fff">%s</text>`, xx, cy+3, v.letter)
-		if len(mk.names) > 1 {
-			fmt.Fprintf(&b, `<text x="%.1f" y="%.1f" font-size="8" fill="var(--ink-3)">+%d</text>`, xx+r+1, cy-3, len(mk.names)-1)
-		}
-		if era {
-			fmt.Fprintf(&b, `<text x="%.1f" y="%.1f" text-anchor="end" font-size="10.5" font-weight="600" fill="var(--accent)">%s</text>`, xx-r-4, cy+4, template.HTMLEscapeString(mk.names[0]))
-		}
+		fmt.Fprintf(&b, `<text x="%.1f" y="%.1f" text-anchor="middle" font-size="7.5" font-weight="800" fill="#fff">%s</text>`, xx, cy+2.6, v.letter)
 		b.WriteString(`</g>`)
 	}
 	// area + line

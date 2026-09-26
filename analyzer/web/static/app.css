@@ -393,3 +393,6 @@ a.brandlink{text-decoration:none;color:inherit}
 .tools-row .more{font-size:11px;font-weight:600;color:var(--ink-3);border:1px solid var(--line);border-radius:999px;padding:0 5px;cursor:help}
 .edit-ico{display:inline-flex;vertical-align:-2px;margin-left:4px;color:var(--ink-3);padding:2px;border-radius:5px}
 .edit-ico:hover{color:var(--accent);background:var(--surface)}
+.land .btn svg{flex:none}
+.trust-icons{display:flex;justify-content:center;gap:18px;flex-wrap:wrap;margin-top:14px}
+.trust-icons span{display:inline-flex;align-items:center;gap:5px;cursor:help}
